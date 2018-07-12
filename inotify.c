@@ -20,6 +20,7 @@ int main(int argc, char const *argv[])
 	int event_buf_len;
     int inot_event_size;
     int offset = 0;
+    char * ptmp;
     struct inotify_event *event;
 
 	if (argc != 2) {
@@ -44,8 +45,9 @@ int main(int argc, char const *argv[])
             printf("could not get event, %s\n", strerror(errno));
         }
 
+        ptmp = event_buf;
         while(event_buf_len) {
-            event = (struct inotify_event *)(event_buf + offset);
+            event = (struct inotify_event *)ptmp;
             if(!event->len)
                 goto next;
 
@@ -60,6 +62,7 @@ int main(int argc, char const *argv[])
         next:  
             offset = inot_event_size + event->len;
             event_buf_len -= offset;
+            ptmp += offset;
         }
 	}
 
